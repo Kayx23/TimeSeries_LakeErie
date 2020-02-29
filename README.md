@@ -1,5 +1,5 @@
-# 4A03_Project
+# 4A03 Project
 
-Feel free to comment and use this as a comment board LOL
+Feel free to leave a comment here
 
 
