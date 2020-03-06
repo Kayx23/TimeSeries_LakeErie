@@ -1,9 +1,10 @@
 
+
 # reading data -------
 LE <- read.csv("/Users/Traky/Desktop/4A03_Project/Lake_Erie.csv")
 
 # take out first column
-LE <- LE[, -1]
+LE <- LE[,-1]
 
 # reorder column
 LE <- LE[, c(2, 1)]
@@ -15,7 +16,7 @@ LE_ts <- ts(
   end = c(1970, 12),
   frequency = 12
 )
-LE_ts <- LE_ts[, -1]
+LE_ts <- LE_ts[,-1]
 
 # plotting -------
 plot(LE_ts,
@@ -27,51 +28,58 @@ plot(diff(LE_ts),
      main = "Diff - Monthly Lake Erie Levels (1921 – 1970)",
      xlab = "",
      ylab = "Lake Erie Water Levels in Tens of Meters")
+# already constant variance
 
-# log transformation -------
-plot(diff(log(LE_ts)), main = "difference log")
+myModel <- diff(LE_ts)
 
-# power transformation -------
-BoxCox.ar(LE_ts, lambda = seq(1.45, 1.6, 0.01))
-lambda = 1.55
-plot((LE_ts) ^ (lambda))
-plot(diff((LE_ts) ^ (lambda)), main = "power with lambda = 1.55")
-myModel <- diff((LE_ts) ^ (lambda))
+# log transformation (no point)
+# plot(diff(log(LE_ts)), main = "difference log")
+
+# power transformation (no point)
+# BoxCox.ar(LE_ts, lambda = seq(1.45, 1.6, 0.01))
+# lambda = 1.55
+# plot((LE_ts) ^ (lambda))
+# plot(diff((LE_ts) ^ (lambda)), main = "power with lambda = 1.55")
+# myModel <- diff((LE_ts) ^ (lambda))
 
 # Dickey-Fuller Test  -------
 library(tseries, quietly = T)
 adf.test(myModel) # stationary
 
 # ACF -------
-acf_myModel <- acf(myModel, main = "acf - myModel")
-pcf_myModel <- pacf(myModel, main = "pacf - myModel")  # AR(1) for non-seasonal component
+acf_diff <- acf(myModel, main = "acf - myModel")
+pcf_diff <- pacf(myModel, main = "pacf - myModel")
+# has seasonality
 
 # str(acf_myModel)
 # x <- cbind(lag = acf_myModel$lag, autocorrelation = acf_myModel$acf)
 # View(x)
 
-# Fourier Transformation -------
+# Detect Seasonality; Fourier Transformation -------
 library(TSA)
 p <- periodogram(myModel)
 seasonality <- p$freq[which.max(p$spec)] # 1/12
-1/seasonality
+1 / seasonality # 12
 
 # Taking out seasonality -------
-myModel_s12 <- diff(myModel, 12)
+# acf(diff(diff(LE_ts,1),lag=12))
+myModel_s12 <- diff(myModel, lag = 12, differences = 1)
 plot(myModel_s12, main = "myModel_s12")
-acf(myModel_s12, main = "acf - myModel_s12",lag.max = 48) # one spike
-pacf(myModel_s12, main = "pacf - myModel_s12")
-# is the spike indicating d=1 for the seasonal component? 
 
-# differencing the seasonal component 
-plot(diff(myModel_s12,1))
+# ACF no seasonality --------
+acf(myModel_s12, main = "acf - myModel_s12", lag.max = 48) # one spike (AR(12)????)
+pacf(myModel_s12, main = "pacf - myModel_s12", lag.max = 48)
+# spike, spike, spike, spike... AR(4) in the seasonal component??????
+# both are geometric, meaning the non-seasonal component is a ARMA model
 
-# Model Selection -------
+# differencing the seasonal component
+plot(diff(myModel_s12, 1))
 
-# Auto select a model as a benchmark
+# Model Selection 1 -------
+
 library(forecast)
 
-# original
+# original--- BENCHMARK
 model_auto = auto.arima(LE_ts, stepwise = FALSE, approximation = FALSE) # take forever
 summary(model_auto)
 # OUTPUT: ARIMA(1,0,2)(2,1,0)[12]
@@ -81,36 +89,89 @@ summary(model_auto)
 # sigma^2 estimated as 0.1996:  log likelihood=-362.41
 # AIC=736.81   AICc=736.96   BIC=763.07
 
+# test our tentative models on "LE_ts"
+
+# ARIMA(1,0,0)(2,1,1)[12]
+model_1 = arima(LE_ts,
+                order = c(1, 0, 0),
+                seasonal = list(order = c(2, 1, 1), period = 12))
+model_1  #AIC 662.9
+
+# ARIMA(1,0,1)(2,1,1)[12]
+model_2 = arima(LE_ts,
+                order = c(1, 0, 1),
+                seasonal = list(order = c(2, 1, 1), period = 12))
+model_2  #AIC 643.27
+
+# ARIMA(1,0,2)(2,1,1)[12]
+model_3 = arima(LE_ts,
+                order = c(1, 0, 2),
+                seasonal = list(order = c(2, 1, 1), period = 12))
+model_3  #AIC 637.71
+
+# ARIMA(1,0,2)(1,1,1)[12]
+model_3.1 = arima(LE_ts,
+                  order = c(1, 0, 2),
+                  seasonal = list(order = c(1, 1, 1), period = 12))
+model_3.1  # 637.17 (best model)
+
+# ARIMA(1,0,2)(2,1,2)[12]
+model_4 = arima(LE_ts,
+                order = c(1, 0, 2),
+                seasonal = list(order = c(2, 1, 2), period = 12))
+model_4  #AIC 638.81
+
+# ARIMA(1,0,2)(3,1,1)[12]
+model_5 = arima(LE_ts,
+                order = c(1, 0, 2),
+                seasonal = list(order = c(3, 1, 1), period = 12))
+model_5  #AIC 638.4
+
+### WINNER: Model 3.1, ARIMA(1,0,2)(1,1,1)[12]
+best_model <- model_3.1
+
+# Model Selection 2 -------
+
 # power transformed
 model_auto_power = auto.arima(myModel, stepwise = FALSE, approximation = FALSE) # take forever
 summary(model_auto_power)
-# OUTPUT: ARIMA(3,0,0)(2,1,0)[12] 
+# OUTPUT: ARIMA(3,0,0)(2,1,0)[12]
 # ar1     ma1     ma2     sar1     sar2
 # 0.2223  0.0498  -0.1082  -0.7107  -0.3463
 # s.e. 0.0412  0.0421   0.0412   0.0390   0.0390
 # sigma^2 estimated as 9.558:  log likelihood=-1496.48
 # AIC=3004.95   AICc=3005.1   BIC=3031.2
 
-# Now, test our tentative models 
-
-# SARIMA
-
-
-
-
-
 
 # Model Diagnostic -------
-
-
-
-
-
-
+plot(residuals(best_model))
+qqnorm(residuals(best_model))
+qqline(residuals(best_model), col = 2)
 
 # Prediction -------
 
+# 80% training, 20% testing
+training = window(LE_ts,start=c(1921,1), end=c(1960,12))
+test = window(LE_ts,start=c(1961,1), end=c(1970,12))
 
+# re-run best model on training
+best_model = arima(training,
+                  order = c(1, 0, 2),
+                  seasonal = list(order = c(1, 1, 1), period = 12))
+best_model  # AIC: 544
+
+# cautious: if we use the trainig from the start, the best model might have been different! 
+
+pred <- predict(best_model, n.ahead=120)
+plot(training, main = "Forecast")
+lines(test,col=12) # actual
+points(pred$pred,col=2) # predicted
+
+# 95% CI
+Upper_CI = pred$pred + 1.96*pred$se
+Lower_CI = pred$pred - 1.96*pred$se
+lines(Upper_CI,lty=2,col=8)
+lines(Lower_CI,lty=2,col=8)
 
 
 
