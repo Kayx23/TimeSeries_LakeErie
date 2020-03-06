@@ -39,7 +39,11 @@ plot((LE_ts) ^ (lambda))
 plot(diff((LE_ts) ^ (lambda)), main = "power with lambda = 1.55")
 myModel <- diff((LE_ts) ^ (lambda))
 
-# Parameter Estimation -------
+# Dickey-Fuller Test  -------
+library(tseries, quietly = T)
+adf.test(myModel) # stationary
+
+# ACF -------
 mean(myModel)
 var(myModel)
 
@@ -51,7 +55,12 @@ acf_myModel <- acf(myModel, main = "acf - myModel")
 x <- cbind(lag = acf_myModel$lag, autocorrelation = acf_myModel$acf)
 View(x)
 
-# conclusion: periodicity of 0.5 (6 months)
+# conclusion: periodicity of 0.5 (6 months)?? wait no.... 
+
+# Fourier Transformation -------
+library(TSA)
+p <- periodogram(myModel)
+seasonality <- p$freq[which.max(p$spec)] # 1/12
 
 
 
