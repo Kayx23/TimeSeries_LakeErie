@@ -1,10 +1,10 @@
 
 
-
+# reading data -------
 LE <- read.csv("/Users/Traky/Desktop/4A03_Project/Lake_Erie.csv")
 
 # take out first column
-LE <- LE[, -1]
+LE <- LE[,-1]
 
 # reorder column
 LE <- LE[, c(2, 1)]
@@ -16,9 +16,9 @@ LE_ts <- ts(
   end = c(1970, 12),
   frequency = 12
 )
-LE_ts <- LE_ts[, -1]
+LE_ts <- LE_ts[,-1]
 
-# plotting
+# plotting -------
 plot(LE_ts,
      main = "Monthly Lake Erie Levels (1921 – 1970)",
      xlab = "",
@@ -29,41 +29,31 @@ plot(diff(LE_ts),
      xlab = "",
      ylab = "Lake Erie Water Levels in Tens of Meters")
 
-# log transformation
-plot(diff(log(LE_ts)))
+# log transformation -------
+plot(diff(log(LE_ts)), main = "difference log")
 
-# power transformation
+# power transformation -------
 BoxCox.ar(LE_ts, lambda = seq(1.45, 1.6, 0.01))
-
 lambda = 1.55
-
 plot((LE_ts) ^ (lambda))
-plot(diff((LE_ts) ^ (lambda)))
+plot(diff((LE_ts) ^ (lambda)), main = "power with lambda = 1.55")
+myModel <- diff((LE_ts) ^ (lambda))
 
-## trying estimating parameters with both transformations
+# Parameter Estimation -------
+mean(myModel)
+var(myModel)
+
+# sine wave ACF
+acf_myModel <- acf(myModel, main = "acf - myModel")
+# pacf(myModel, main="pacf - myModel")
+
+#str(acf_myModel)
+x <- cbind(lag = acf_myModel$lag, autocorrelation = acf_myModel$acf)
+View(x)
+
+# conclusion: periodicity of 0.5 (6 months)
+
+
 
 # https://kimberlyannschveder.wordpress.com/2018/07/07/lake-erie-level-data/
 # https://towardsdatascience.com/a-time-series-analysis-of-lake-erie-from-1921-to-1970-using-a-sarima-model-b79698df4762
-
-
-
-# Note that the order of moving average corresponds to seasonal frequency, which is
-# usually a first step in classical time series decomposition.
-
-# step 1 - find seasonality
-library(TSA)
-
-# Fourier Transformation
-p <- periodogram(LE_ts)
-p$freq[which.max(p$spec)] # 1/12 USELESS LOL
-
-p_df <- data.frame(freq=p$freq, spec=p$spec)
-
-# step 2 - find entered MA by taking out the seasonality 
-trend_beer = ma(timeserie_beer, order = 4, centre = T)
-plot(as.ts(timeserie_beer))
-lines(trend_beer)
-plot(as.ts(trend_beer))
-
-
-
