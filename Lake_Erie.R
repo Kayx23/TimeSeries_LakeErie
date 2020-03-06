@@ -49,19 +49,22 @@ var(myModel)
 
 # sine wave ACF
 acf_myModel <- acf(myModel, main = "acf - myModel")
-# pacf(myModel, main="pacf - myModel")
+pcf_myModel <- pacf(myModel, main="pacf - myModel")
 
 #str(acf_myModel)
 x <- cbind(lag = acf_myModel$lag, autocorrelation = acf_myModel$acf)
 View(x)
 
-# conclusion: periodicity of 0.5 (6 months)?? wait no.... 
+# WHAT DO YOU CONCLUDE FROM THAT ACF THO
 
 # Fourier Transformation -------
 library(TSA)
 p <- periodogram(myModel)
 seasonality <- p$freq[which.max(p$spec)] # 1/12
 
+# Taking out seasonality -------
+myModel_s12 <- diff(myModel,12)
+plot(myModel_s12,main="myModel_s12")
 
 
 # https://kimberlyannschveder.wordpress.com/2018/07/07/lake-erie-level-data/
