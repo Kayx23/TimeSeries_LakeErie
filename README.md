@@ -13,3 +13,14 @@ W/o transforming the series, it already looks like it has a constant variance. T
 ARIMA(1,0,2)(2,1,1)12 performs similarly too
 
 -- Traky
+
+
+### March 21st
+
+Compared two transformation method:
+                A. Differencing
+                B. Log Trasformation
+Both methods result a similar time series plot with flat tendency and fairly stable dispersion.
+From the qq plot, it shows that method A have a right-skewed trend and method B have a left-skewed trend.
+
+-- Line
