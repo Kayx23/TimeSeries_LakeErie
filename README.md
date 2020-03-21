@@ -1,5 +1,11 @@
 # 4A03 Project
 
+
+### Model Proposed
+⋅⋅* once differencing
+
+
+### Requirement
 "...The report should be from 5 to no more than 10 double-spaced single-column pages using a font size 10-12, not including images and graphs."
 
 ".... In an individual contribution form, which is to be completed at the end of the project, you will be asked to summarize the contribution of each of your group members and evaluate the strengths and weaknesses of the team. While the project grade is primarily a group grade, individual grades will be adjusted based on your own contribution and your peer assessments."
