@@ -48,24 +48,66 @@ library(tseries, quietly = T)
 adf.test(myModel) # stationary
 
 # ACF -------
-acf_diff <- acf(myModel, main = "acf - myModel")
-pcf_diff <- pacf(myModel, main = "pacf - myModel")
-# has seasonality
+library(PerformanceAnalytics)
+chart.ACFplus(myModel,main = "Lagged-one Differenced Series",maxlag = 80)
 
-# str(acf_myModel)
-# x <- cbind(lag = acf_myModel$lag, autocorrelation = acf_myModel$acf)
-# View(x)
-
-# Detect Seasonality; Fourier Transformation -------
+# Fourier Transformation -------
 library(TSA)
 p <- periodogram(myModel)
 seasonality <- p$freq[which.max(p$spec)] # 1/12
 1 / seasonality # 12
 
 # Taking out seasonality -------
-# acf(diff(diff(LE_ts,1),lag=12))
-myModel_s12 <- diff(myModel, lag = 12, differences = 1)
-plot(myModel_s12, main = "myModel_s12")
+T<-diff(diff(LE_ts,1),lag=12)
+chart.ACFplus(T, main = "Lagged-twelves Series",maxlag = 80)
+# chart.ACFplus(diff(diff(diff(LE_ts,1),lag=12),lag=12), main = "second Lagged-twelves Series",maxlag = 80)
+
+adf.test(T) #STATIONARY
+plot(T)
+
+# model proposal ----------
+# non-seasoal: AR(1 or 0); MA(0,1,2,3)
+# seasonal: AR(1,2), ma(1,2,3,4)
+
+arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 647.5
+arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 2), period = 12)) # aic = 649.13
+arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 3), period = 12)) # aic = 648.58
+arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 4), period = 12)) # aic = 650.22
+
+arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(2, 1, 1), period = 12)) # aic = 647.65
+
+arima(LE_ts,order = c(0, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 667.36
+arima(LE_ts,order = c(1, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 649.3
+arima(LE_ts,order = c(1, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 646.84
+
+arima(LE_ts,order = c(2, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 649.05
+
+
+
+
+# best: ARIMA(1,0,2)(2,1,1)[12] --> AIC 637.71
+# try lag 12
+
+# decomposition --------------
+
+decomp_LE <- decompose(LE_ts)
+plot(decomp_LE)
+
+de_seasoned <- LE_ts - decomp_LE$seasonal
+plot(de_seasoned) # need to detrend
+plot(diff(de_seasoned)) # good
+chart.ACFplus(diff(de_seasoned),maxlag = 80)
+
+plot(decomp_LE$seasonal)
+plot(diff(decomp_LE$seasonal,12))
+chart.ACFplus(decomp_LE$seasonal)
+
+arima(LE_ts,order = c(2, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.12
+arima(LE_ts,order = c(2, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.12
+# ===============================
+
+# myModel_s12 <- diff(myModel, lag = 12, differences = 1)
+# plot(myModel_s12, main = "myModel_s12")
 
 # ACF no seasonality --------
 acf(myModel_s12, main = "acf - myModel_s12", lag.max = 48) # one spike (AR(12)????)
