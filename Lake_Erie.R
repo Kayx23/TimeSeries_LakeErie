@@ -1,5 +1,3 @@
-
-
 # reading data -------
 LE <- read.csv("/Users/Traky/Desktop/4A03_Project/Lake_Erie.csv")
 
@@ -8,6 +6,10 @@ LE <- LE[,-1]
 
 # reorder column
 LE <- LE[, c(2, 1)]
+
+# NORMALITY? 
+hist(LE$Level,xlab="Water Levels in Tens of Meters",main="")
+qqnorm(LE$Level);qqline(LE$Level,col=2)
 
 # Convert to a ts object
 LE_ts <- ts(
@@ -20,20 +22,17 @@ LE_ts <- LE_ts[,-1]
 
 # plotting -------
 plot(LE_ts,
-     main = "Monthly Lake Erie Levels (1921 – 1970)",
+     main = "Monthly Lake Erie Water Levels (1921 – 1970)",
      xlab = "",
-     ylab = "Lake Erie Water Levels in Tens of Meters")
+     ylab = "Water Levels in Tens of Meters")
 
 plot(diff(LE_ts),
-     main = "Diff - Monthly Lake Erie Levels (1921 – 1970)",
+     main = "Lagged-one Differenced Series",
      xlab = "",
-     ylab = "Lake Erie Water Levels in Tens of Meters")
-# already constant variance
+     ylab = "Water Levels in Tens of Meters")
+# already constant variance?
 
 myModel <- diff(LE_ts)
-
-# log transformation (no point)
-# plot(diff(log(LE_ts)), main = "difference log")
 
 # power transformation (no point)
 # BoxCox.ar(LE_ts, lambda = seq(1.45, 1.6, 0.01))
@@ -41,6 +40,8 @@ myModel <- diff(LE_ts)
 # plot((LE_ts) ^ (lambda))
 # plot(diff((LE_ts) ^ (lambda)), main = "power with lambda = 1.55")
 # myModel <- diff((LE_ts) ^ (lambda))
+
+# log is not appropriate 
 
 # Dickey-Fuller Test  -------
 library(tseries, quietly = T)
@@ -147,6 +148,12 @@ summary(model_auto_power)
 plot(residuals(best_model))
 qqnorm(residuals(best_model))
 qqline(residuals(best_model), col = 2)
+
+t<- acf(residuals(best_model))    # hmmm is this right.....
+max(t$acf) #0.1372544
+
+
+
 
 # Prediction -------
 
