@@ -49,7 +49,7 @@ adf.test(myModel) # stationary
 
 # ACF -------
 library(PerformanceAnalytics)
-chart.ACFplus(myModel,main = "Lagged-one Differenced Series",maxlag = 80)
+chart.ACFplus(myModel,main = "Lagged-one Differenced Series",maxlag = 60)
 
 # Fourier Transformation -------
 library(TSA)
@@ -59,7 +59,7 @@ seasonality <- p$freq[which.max(p$spec)] # 1/12
 
 # Taking out seasonality -------
 T<-diff(diff(LE_ts,1),lag=12)
-chart.ACFplus(T, main = "Lagged-twelves Series",maxlag = 80)
+chart.ACFplus(T, main = "Lagged-twelves Series",maxlag = 60)
 # chart.ACFplus(diff(diff(diff(LE_ts,1),lag=12),lag=12), main = "second Lagged-twelves Series",maxlag = 80)
 
 adf.test(T) #STATIONARY
@@ -83,8 +83,6 @@ arima(LE_ts,order = c(1, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12))
 arima(LE_ts,order = c(2, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 649.05
 
 
-
-
 # best: ARIMA(1,0,2)(2,1,1)[12] --> AIC 637.71
 # try lag 12
 
@@ -103,7 +101,7 @@ plot(diff(decomp_LE$seasonal,12))
 chart.ACFplus(decomp_LE$seasonal)
 
 arima(LE_ts,order = c(2, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.12
-arima(LE_ts,order = c(2, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.12
+
 # ===============================
 
 # myModel_s12 <- diff(myModel, lag = 12, differences = 1)
