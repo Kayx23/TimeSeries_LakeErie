@@ -41,6 +41,7 @@ diff_LE <- diff(LE_ts)
 # Dickey-Fuller Test
 library(tseries, quietly = T)
 adf.test(diff_LE) # stationary
+adf.test(LE_ts)
 
 # ACF & PCF ---------
 library(PerformanceAnalytics)
@@ -135,3 +136,5 @@ summary(model_auto)
 
 plot(m1,n.ahead = 12*3,n1=c(1960,1))
 plot(m2,n.ahead = 12*3,n1=c(1960,1))
+
+

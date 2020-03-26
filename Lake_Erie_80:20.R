@@ -28,13 +28,13 @@ test<-window(LE_ts,start=c(1961,1))
 
 # plot the original series
 plot(train,
-     main = "Monthly Lake Erie Water Levels (1921 – 1970)",
+     main = "Monthly Lake Erie Water Levels (1921 – 1960)",
      xlab = "",
      ylab = "Water Levels in Tens of Meters")
 
 # plot the lagged-one differenced series
 plot(diff(train),
-     main = "Lagged-one Differenced Series",
+     main = "Lagged-one Differenced Series (1921 – 1960)",
      xlab = "",
      ylab = "Water Levels in Tens of Meters")
 
@@ -48,7 +48,7 @@ adf.test(diff_LE) # stationary
 
 # ACF & PCF ---------
 library(PerformanceAnalytics)
-chart.ACFplus(diff_LE,main = "Lagged-one Differenced Series",maxlag = 60)
+chart.ACFplus(diff_LE,main = "Lagged-one Differenced Series (training)",maxlag = 60)
 
 # seasonality ---------
 library(TSA)
@@ -69,11 +69,11 @@ chart.ACFplus(train-pred)
 lagged12_diff_LE<-diff(diff_LE,lag=12)
 
 # plot
-plot(window(lagged12_diff_LE,start=c(1956,1)),ylab="",main="First and Seasonal Difference of the Series")
+plot(window(lagged12_diff_LE,start=c(1956,1)),ylab="",main="First and Seasonal Difference of the Series (train)")
 points(y=lagged12_diff_LE,x=time(lagged12_diff_LE),pch=as.vector(season(lagged12_diff_LE)))
 
 # acf...
-chart.ACFplus(lagged12_diff_LE, main = "First and Seasonal Difference of the Series",maxlag = 60)
+chart.ACFplus(lagged12_diff_LE, main = "First and Seasonal Difference of the Series (train)",maxlag = 60)
 
 # Model Fitting ------------
 
@@ -115,9 +115,9 @@ m2 <- arima(train,order = c(3, 1, 3),seasonal = list(order = c(1, 1, 1), period 
 # m1 - ARIMA(1,1,0)x(0,1,1)12 
 # m2 - ARIMA(3,1,3)x(1,1,1)12
 
-plot(m1,n.ahead = 120,n1=c(1950,1), type="l",main = "Forecast")
+plot(m1,n.ahead = 120,n1=c(1950,1), type="l",main = "Forecast - ARIMA(1,1,0)x(0,1,1)12 ")
 lines(test,col=12)
 
-plot(m2,n.ahead = 120,n1=c(1950,1), type="l",main = "Forecast")
+plot(m2,n.ahead = 120,n1=c(1950,1), type="l",main = "Forecast - ARIMA(3,1,3)x(1,1,1)12")
 lines(test,col=12)
 
