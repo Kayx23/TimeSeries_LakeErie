@@ -1,5 +1,4 @@
 library(TSA)
-library(forecast)
 
 # data prep -------
 
@@ -102,25 +101,17 @@ arima(LE_ts,order = c(3, 1, 3),seasonal = list(order = c(1, 1, 1), period = 12))
 arima(LE_ts,order = c(3, 1, 3),seasonal = list(order = c(0, 1, 1), period = 12)) # aic = 641.34
 # warning - possible convergence problem
 
-# decomposition --------------
+# model selection ----------
 
-decomp_LE <- decompose(LE_ts)
-plot(decomp_LE)
+# We proceed with these two models 
 
-de_seasoned <- LE_ts - decomp_LE$seasonal
-plot(de_seasoned) # need to detrend
-plot(diff(de_seasoned)) # good
-chart.ACFplus(diff(de_seasoned),maxlag = 80)
+# ARIMA(1,1,0)x(0,1,1)12 
+m1 <- arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(0, 1, 1), period = 12)) # aic = 645.71
 
-plot(decomp_LE$seasonal)
-plot(diff(decomp_LE$seasonal,12))
-chart.ACFplus(decomp_LE$seasonal)
+# ARIMA(3,1,3)x(1,1,1)12
+m2 <- arima(LE_ts,order = c(3, 1, 3),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.17
 
-arima(LE_ts,order = c(2, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.12
-
-# Random SARIMA Models -------
-
-library(forecast)
+# auto SARIMA -------
 
 # auto.arima on the original series
 model_auto = auto.arima(LE_ts, stepwise = FALSE, approximation = FALSE) # take forever
@@ -132,71 +123,20 @@ summary(model_auto)
 # sigma^2 estimated as 0.1996:  log likelihood=-362.41
 # AIC=736.81   AICc=736.96   BIC=763.07
 
-# ARIMA(1,0,0)(2,1,1)[12]
-model_1 = arima(LE_ts,
-                order = c(1, 0, 0),
-                seasonal = list(order = c(2, 1, 1), period = 12))
-model_1  #AIC 662.9
-
-# ARIMA(1,0,1)(2,1,1)[12]
-model_2 = arima(LE_ts,
-                order = c(1, 0, 1),
-                seasonal = list(order = c(2, 1, 1), period = 12))
-model_2  #AIC 643.27
-
-# ARIMA(1,0,2)(2,1,1)[12]
-model_3 = arima(LE_ts,
-                order = c(1, 0, 2),
-                seasonal = list(order = c(2, 1, 1), period = 12))
-model_3  #AIC 637.71
-
-# ARIMA(1,0,2)(1,1,1)[12]
-model_3.1 = arima(LE_ts,
-                  order = c(1, 0, 2),
-                  seasonal = list(order = c(1, 1, 1), period = 12))
-model_3.1  # 637.17 (best model)
-
-# ARIMA(1,0,2)(2,1,2)[12]
-model_4 = arima(LE_ts,
-                order = c(1, 0, 2),
-                seasonal = list(order = c(2, 1, 2), period = 12))
-model_4  #AIC 638.81
-
-# ARIMA(1,0,2)(3,1,1)[12]
-model_5 = arima(LE_ts,
-                order = c(1, 0, 2),
-                seasonal = list(order = c(3, 1, 1), period = 12))
-model_5  #AIC 638.4
-
-### WINNER: Model 3.1, ARIMA(1,0,2)(1,1,1)[12]
-best_model <- model_3.1
+# ARIMA(1,0,0)(2,1,1)[12] - AIC 662.9
+# ARIMA(1,0,1)(2,1,1)[12] - AIC 643.27
+# ARIMA(1,0,2)(2,1,1)[12] - AIC 637.71
+# ARIMA(1,0,2)(1,1,1)[12] - AIC 637.17 (lowest)
+# ARIMA(1,0,2)(2,1,2)[12] - AIC 638.81
+# ARIMA(1,0,2)(3,1,1)[12] - AIC 638.4
 
 # Model Diagnostic -------
-## WENDY TO FILL IN THE SECTION
+## Wendy
 
 # Prediction -------
 
-# 80/20 training/testing split ------
-train<-window(diff(LE_ts),end=c(1960,12))
-test<-window(diff(LE_ts),start=c(1961,1))
+# m1 - ARIMA(1,1,0)x(0,1,1)12 
+# m2 - ARIMA(3,1,3)x(1,1,1)12
 
-# 80% training, 20% testing
-training = window(LE_ts,start=c(1921,1), end=c(1960,12))
-test = window(LE_ts,start=c(1961,1), end=c(1970,12))
-
-# re-run best model on training
-best_model = arima(training,
-                  order = c(1, 0, 2),
-                  seasonal = list(order = c(1, 1, 1), period = 12))
-best_model  # AIC: 544
-
-pred <- predict(best_model, n.ahead=120)
-plot(training, main = "Forecast")
-lines(test,col=12) # actual
-points(pred$pred,col=2) # predicted
-
-# 95% CI
-Upper_CI = pred$pred + 1.96*pred$se
-Lower_CI = pred$pred - 1.96*pred$se
-lines(Upper_CI,lty=2,col=8)
-lines(Lower_CI,lty=2,col=8)
+plot(m1,n.ahead = 12*3,n1=c(1960,1))
+plot(m2,n.ahead = 12*3,n1=c(1960,1))
