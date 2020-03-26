@@ -108,7 +108,40 @@ m1 <- arima(train,order = c(1, 1, 0),seasonal = list(order = c(0, 1, 1), period 
 m2 <- arima(train,order = c(3, 1, 3),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.17
 
 # Model Diagnostic -------
-## WENDY TO FILL IN THE SECTION
+
+# m1 - ARIMA(1,1,0)x(0,1,1)12 
+
+# calculating residuals
+m1.res <- train-fitted(m1,train)
+
+# plotting residuals
+plot(m1.res,main="Residuals of ARIMA(1,1,0)x(0,1,1)12")
+
+# residuals autocorrelations
+chart.ACFplus(m1.res, main = "Residuals of ARIMA(1,1,0)x(0,1,1)12",maxlag = 60)
+
+# residual histogram
+hist(m1.res, main="Residuals of ARIMA(1,1,0)x(0,1,1)12")
+
+# reisidual QQ plot
+qqnorm(m1.res,main = "Residuals of ARIMA(1,1,0)x(0,1,1)12"); qqline(m1.res,col=2)
+
+# m2 - ARIMA(3,1,3)x(1,1,1)12
+
+# calculating residuals
+m2.res <- train-fitted(m2,train)
+
+# plotting residuals
+plot(m2.res,main="Residuals of ARIMA(3,1,3)x(1,1,1)12")
+
+# residuals autocorrelations
+chart.ACFplus(m2.res, main = "Residuals of ARIMA(3,1,3)x(1,1,1)12",maxlag = 60)
+
+# residual histogram
+hist(m2.res, main="Residuals of ARIMA(3,1,3)x(1,1,1)12")
+
+# reisidual QQ plot
+qqnorm(m2.res,main = "Residuals of ARIMA(3,1,3)x(1,1,1)12"); qqline(m2.res,col=2)
 
 # Prediction -------
 
