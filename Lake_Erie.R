@@ -72,11 +72,6 @@ lagged12_diff_LE<-diff(diff_LE,lag=12)
 plot(window(lagged12_diff_LE,start=c(1966,1)),ylab="",main="First and Seasonal Difference of the Series")
 points(y=lagged12_diff_LE,x=time(lagged12_diff_LE),pch=as.vector(season(lagged12_diff_LE)))
 
-# is there still a seasonality
-p <- periodogram(lagged12_diff_LE)
-seasonality <- p$freq[which.max(p$spec)] # 0.12
-1 / seasonality # 12
-
 # acf...
 chart.ACFplus(lagged12_diff_LE, main = "First and Seasonal Difference of the Series",maxlag = 60)
 
@@ -131,7 +126,7 @@ summary(model_auto)
 # ARIMA(1,0,2)(3,1,1)[12] - AIC 638.4
 
 # Model Diagnostic -------
-## Wendy
+## Wendy to fill in
 
 # Prediction -------
 
