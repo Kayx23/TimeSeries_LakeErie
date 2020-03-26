@@ -1,4 +1,5 @@
 library(TSA)
+library(forecast)
 
 # data prep -------
 
@@ -36,49 +37,70 @@ plot(diff(LE_ts),
 
 diff_LE <- diff(LE_ts)
 
-
-
 # stationarity test -------
 
 # Dickey-Fuller Test
 library(tseries, quietly = T)
 adf.test(diff_LE) # stationary
 
-# ACF & PCF -------
+# ACF & PCF ---------
 library(PerformanceAnalytics)
 chart.ACFplus(diff_LE,main = "Lagged-one Differenced Series",maxlag = 60)
 
-# seasonality -------
-
-# Fourier Transformation
+# seasonality ---------
 library(TSA)
 p <- periodogram(diff_LE)
 seasonality <- p$freq[which.max(p$spec)] # 1/12
 1 / seasonality # 12
 
-# taking out seasonality
+# deterministic trend model ---------
+
+# do the residuals show autocorrelation
+fit<-lm(LE_ts~season(LE_ts)-1); fit
+pred<-predict(fit)
+chart.ACFplus(LE_ts-pred)
+
+# perfect AR(1) !!!
+# but we can't proceed with deterministic trend no more
+# moving onto SARIMA
+
+# SARIMA -------
+
+# seasonal difference
 lagged12_diff_LE<-diff(diff_LE,lag=12)
-chart.ACFplus(lagged12_diff_LE, main = "Lagged-twelves Series",maxlag = 60)
 
-# model proposal ----------
-# non-seasoal: AR(1 or 0); MA(0,1,2,3)
-# seasonal: AR(1,2), ma(1,2,3,4)
+# plot
+plot(window(lagged12_diff_LE,start=c(1966,1)),ylab="",main="First and Seasonal Difference of the Series")
+points(y=lagged12_diff_LE,x=time(lagged12_diff_LE),pch=as.vector(season(lagged12_diff_LE)))
 
+# is there still a seasonality
+p <- periodogram(lagged12_diff_LE)
+seasonality <- p$freq[which.max(p$spec)] # 0.12
+1 / seasonality # 12
+
+# acf...
+chart.ACFplus(lagged12_diff_LE, main = "First and Seasonal Difference of the Series",maxlag = 60)
+
+# Model Fitting ------------
+
+# ARIMA(1,1,0)x(1,1,1)12
 arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 647.5
-arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 2), period = 12)) # aic = 649.13
-arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 3), period = 12)) # aic = 648.58
-arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 4), period = 12)) # aic = 650.22
 
-arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(2, 1, 1), period = 12)) # aic = 647.65
+# ARIMA(1,1,0)x(0,1,1)12
+arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(0, 1, 1), period = 12)) # aic = 645.71
 
-arima(LE_ts,order = c(0, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 667.36
-arima(LE_ts,order = c(1, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 649.3
-arima(LE_ts,order = c(1, 1, 2),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 646.84
+# ARIMA(1,1,1)x(1,1,1)12
+arima(LE_ts,order = c(1, 1, 1),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 649.29
 
-arima(LE_ts,order = c(2, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 649.05
+# ARIMA(1,1,1)x(0,1,1)12
+arima(LE_ts,order = c(1, 1, 1),seasonal = list(order = c(0, 1, 1), period = 12)) # aic = 647.52
 
-# best: ARIMA(1,0,2)(2,1,1)[12] --> AIC 637.71
-# try lag 12
+# ARIMA(3,1,3)x(1,1,1)12
+arima(LE_ts,order = c(3, 1, 3),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.17
+
+# ARIMA(3,1,3)x(0,1,1)12
+arima(LE_ts,order = c(3, 1, 3),seasonal = list(order = c(0, 1, 1), period = 12)) # aic = 641.34
+# warning - possible convergence problem
 
 # decomposition --------------
 
