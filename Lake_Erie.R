@@ -86,7 +86,7 @@ chart.ACFplus(lagged12_diff_LE, main = "First and Seasonal Difference of the Ser
 # ARIMA(1,1,0)x(1,1,1)12
 arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 647.5
 
-# ARIMA(1,1,0)x(0,1,1)12
+# ARIMA(1,1,0)x(0,1,1)12 - chosen 1
 arima(LE_ts,order = c(1, 1, 0),seasonal = list(order = c(0, 1, 1), period = 12)) # aic = 645.71
 
 # ARIMA(1,1,1)x(1,1,1)12
@@ -95,7 +95,7 @@ arima(LE_ts,order = c(1, 1, 1),seasonal = list(order = c(1, 1, 1), period = 12))
 # ARIMA(1,1,1)x(0,1,1)12
 arima(LE_ts,order = c(1, 1, 1),seasonal = list(order = c(0, 1, 1), period = 12)) # aic = 647.52
 
-# ARIMA(3,1,3)x(1,1,1)12
+# ARIMA(3,1,3)x(1,1,1)12 - chosen 2
 arima(LE_ts,order = c(3, 1, 3),seasonal = list(order = c(1, 1, 1), period = 12)) # aic = 641.17
 
 # ARIMA(3,1,3)x(0,1,1)12
