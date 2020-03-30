@@ -154,3 +154,17 @@ lines(test,col=12)
 plot(m2,n.ahead = 120,n1=c(1950,1), type="l",main = "Forecast - ARIMA(3,1,3)x(1,1,1)12")
 lines(test,col=12)
 
+#----------------------------------------------------------------------------------------------------------------------------------
+## Last Prediction Comparison Plot
+m1pred = predictf(m1, n.ahead = 120)$pred
+m2pred = predictf(m2, n.ahead = 120)$pred
+
+plot(test,type='l',col = "blue", lwd = 2, , main = "Comparison between Forecast Illustrations", ylab = "Water Level in Tens Meter")
+lines(m1pred, col = "orange",lwd = 3)
+lines(m2pred, col = "chocolate", lwd = 3)
+
+legend("bottomright", 
+       legend = c("Testing dataset", "ARIMA(1,1,0)x(0,1,1)12","ARIMA(3,1,3)x(1,1,1)12"), 
+       col = c("blue", "orange", "chocolate"),
+       lwd = c(2,3,3))
+#--------------------------------------------------------------------------------------------------------------------------------------
