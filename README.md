@@ -6,6 +6,9 @@
 </a>
 </p>
 
+### Course
+* STATS 4A03/6A03, McMaster University (Winter 2020)
+
 ### References
 * Text: Time Series Analysis With Applications in R
 * LaTex Poster template: Gemini -> https://github.com/anishathalye/gemini
