@@ -42,7 +42,7 @@ points(y = LE_ts,
        pch = as.vector(season(LE_ts)))
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-2-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot the training series
@@ -52,7 +52,7 @@ plot(train,
      ylab = "Water Levels in Tens of Meters")
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-1.png" style="display: block; margin: auto;" />
 
 ``` r
 # plot the lagged-one differenced series
@@ -62,7 +62,7 @@ plot(diff(train),
      ylab = "Water Levels in Tens of Meters")
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-2.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-2.png" style="display: block; margin: auto;" />
 
 ``` r
 diff_LE <- diff(train)
@@ -87,7 +87,7 @@ chart.ACFplus(diff_LE,
               maxlag = 60)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-3.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-3.png" style="display: block; margin: auto;" />
 
 ``` r
 # Seasonality ---------
@@ -95,7 +95,7 @@ library(TSA)
 p <- periodogram(diff_LE)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-4.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-4.png" style="display: block; margin: auto;" />
 
 ``` r
 seasonality <- p$freq[which.max(p$spec)] # 1/12
@@ -129,7 +129,7 @@ pred <- predict(fit)
 chart.ACFplus(train - pred)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-5.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-5.png" style="display: block; margin: auto;" />
 
 ``` r
 # SARIMA -------
@@ -146,7 +146,7 @@ points(y = lagged12_diff_LE,
        pch = as.vector(season(lagged12_diff_LE)))
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-6.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-6.png" style="display: block; margin: auto;" />
 
 ``` r
 # ACF&PACF
@@ -155,7 +155,7 @@ chart.ACFplus(lagged12_diff_LE,
               maxlag = 60)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-7.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-7.png" style="display: block; margin: auto;" />
 
 ``` r
 # Model Fitting ------------
@@ -295,7 +295,7 @@ m1.res <- train - fitted(m1, train)
 plot(m1.res, main = "Residuals of ARIMA(1,1,0)x(0,1,1)12")
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-8.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-8.png" style="display: block; margin: auto;" />
 
 ``` r
 # residuals autocorrelations
@@ -304,7 +304,7 @@ chart.ACFplus(m1.res,
               maxlag = 60)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-9.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-9.png" style="display: block; margin: auto;" />
 
 ``` r
 par(mfrow = c(1, 2))
@@ -317,7 +317,7 @@ qqnorm(m1.res, main = "Residuals of ARIMA(1,1,0)x(0,1,1)12")
 qqline(m1.res, col = 2)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-10.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-10.png" style="display: block; margin: auto;" />
 
 ``` r
 # m2 - ARIMA(3,1,3)x(1,1,1)12
@@ -331,7 +331,7 @@ par(mfrow = c(1, 1))
 plot(m2.res, main = "Residuals of ARIMA(3,1,3)x(1,1,1)12")
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-11.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-11.png" style="display: block; margin: auto;" />
 
 ``` r
 # residuals autocorrelations
@@ -340,7 +340,7 @@ chart.ACFplus(m2.res,
               maxlag = 60)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-12.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-12.png" style="display: block; margin: auto;" />
 
 ``` r
 par(mfrow = c(1, 2))
@@ -353,7 +353,7 @@ qqnorm(m2.res, main = "Residuals of ARIMA(3,1,3)x(1,1,1)12")
 qqline(m2.res, col = 2)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-13.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-13.png" style="display: block; margin: auto;" />
 
 ``` r
 par(mfrow = c(1, 1))
@@ -373,7 +373,7 @@ m1.plot <- plot(
 lines(test, col = 12)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-14.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-14.png" style="display: block; margin: auto;" />
 
 ``` r
 m2.plot <- plot(
@@ -386,7 +386,7 @@ m2.plot <- plot(
 lines(test, col = 12)
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-15.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-15.png" style="display: block; margin: auto;" />
 
 ``` r
 # Prediction Comparison Plot
@@ -416,7 +416,7 @@ legend(
 )
 ```
 
-<img src="Lake_Erie_80-20-copy_files/figure-gfm/unnamed-chunk-3-16.png" style="display: block; margin: auto;" />
+<img src="Lake_Erie_80-20_files/figure-gfm/unnamed-chunk-3-16.png" style="display: block; margin: auto;" />
 
 ``` r
 # checking constant mean each cycle in prediction
